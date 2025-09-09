@@ -1,0 +1,85 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Video Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-950 text-white text-center py-6">
+        <h1 class="text-4xl font-bold">Gretchen Burkholder</h1>
+        <p class="mt-2 text-lg">Samples of short answer technical videos created in Camtasia</p>
+    </header>
+    <main class="container mx-auto py-8">
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Video 1 -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-2">Video 1: Requisition Security</h2>
+                <div class="relative" style="padding-bottom: 56.25%;">
+                               <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/viBvE-s714c?si=uZYMKgMLBfyn_rp_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <p class="mt-2 text-gray-600">Oracle Recruiting - How do I control job requisition visibility</p>
+            </div>
+            <!-- Video 2 -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-2">Video 2: Candidate Disposal</h2>
+                <div class="relative" style="padding-bottom: 56.25%;">
+                    <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/GhBWwQSuXRk?si=VFDx0ailK01xHjHE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <p class="mt-2 text-gray-600">Oracle Recruiting - How do I dispose of a candidate from the Recruiting database?</p>
+            </div>
+            <!-- Video 3 -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-2">Video 3: Career Site Map View</h2>
+                <div class="relative" style="padding-bottom: 56.25%;">
+                    <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/DV8AkbgYnHg?si=4B9L9WkUMxBzGAav" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <p class="mt-2 text-gray-600">Oracle Recruiting - How do I set up map view to display jobs accurately on a map to candidates? (includes CC)</p>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-800 text-white text-center py-4">
+        <p>&copy; 2025 Gretchen Burkholder. All rights reserved.</p>
+    </footer>
+</body>
+</html>
